@@ -16,7 +16,7 @@ SELECT DISTINCT ?painting ?paintingLabel ?artistLabel ?museumLabel ?coord ?image
           
   FILTER(?country != wd:Q29) # Not exposed in Spain
   
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],es". }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
 }
 LIMIT 50
 `;
@@ -72,12 +72,13 @@ function parseWKTPoint(wkt) {
 function renderArtworks(bindings) {
     markersLayer.clearLayers();
 
-    // Icono personalizado premium
-    const artIcon = L.icon({
-        iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Map_marker_icon_%E2%80%93_Nicolas_Mollet_%E2%80%93_Art_gallery_%E2%80%93_Default.png',
-        iconSize: [32, 37],
-        iconAnchor: [16, 37],
-        popupAnchor: [0, -37]
+    // Icono personalizado premium usando SVG o DivIcon para evitar enlaces caídos
+    const artIcon = L.divIcon({
+        html: '<div style="font-size: 24px; text-shadow: 0 0 5px #d4af37, 2px 2px 4px rgba(0,0,0,0.8);">🎨</div>',
+        className: 'custom-art-marker',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
     });
 
     bindings.forEach(info => {
@@ -86,7 +87,9 @@ function renderArtworks(bindings) {
         if (!coords) return;
 
         // Variables de datos (controlando indefinidos, aunque la query pide obligatorios)
-        const title = info.paintingLabel ? info.paintingLabel.value : "Obra Desconocida";
+        let title = info.paintingLabel ? info.paintingLabel.value : "Obra Desconocida";
+        if (/^Q\d+$/.test(title)) title = "Sin título traducido disponible";
+        
         const artist = info.artistLabel ? info.artistLabel.value : "Autor Desconocido";
         const museum = info.museumLabel ? info.museumLabel.value : "Museo Desconocido";
         const imageUrl = info.image ? info.image.value : "https://via.placeholder.com/250x180?text=Sin+Imagen";
