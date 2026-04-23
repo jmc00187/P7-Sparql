@@ -4,7 +4,7 @@ const endpointUrl = 'https://query.wikidata.org/sparql';
 // Query SPARQL: 20 cuadros (se puede ampliar) de pintores españoles en museos fuera de España
 const sparqlQuery = `
 SELECT DISTINCT ?painting ?paintingLabel ?artistLabel ?museumLabel ?coord ?image WHERE {
-  ?painting wdt:P31/wdt:P279* wd:Q3305213; # instance of painting
+  ?painting wdt:P31 wd:Q3305213; # instance of painting
             wdt:P170 ?artist; # author
             wdt:P276 ?museum; # location
             wdt:P18 ?image. # image
@@ -18,7 +18,7 @@ SELECT DISTINCT ?painting ?paintingLabel ?artistLabel ?museumLabel ?coord ?image
   
   SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
 }
-LIMIT 50
+LIMIT 30
 `;
 
 // Variables globales
